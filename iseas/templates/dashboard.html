@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>SITE COMMAND - Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="10">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/command_center.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="brand">
+                <div class="brand-text">
+                    <h1>Site Command</h1>
+                    <small>STATUS: ONLINE // SYSTEM: ACTIVE</small>
+                </div>
+            </div>
+
+            <div class="brand-placeholder rounded-logo">
+                <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Logo">
+            </div>
+
+            <div class="header-actions">
+                <a href="/rfid_cards" class="btn-scan">
+                    INITIATE SCAN
+                </a>
+                <a href="/faces" class="btn-scan">
+                    AUTHORIZE
+                </a>
+            </div>
+        </header>
+
+        <!-- PPE Rules Card -->
+        <div class="main-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <span class="card-title-icon">⚠️</span>
+                    MANDATORY SAFETY PROTOCOLS
+                </h2>
+                <small>AUTHORIZATION LEVEL: ADMIN</small>
+            </div>
+            <div class="card-body">
+                <form action="/update_ppe" method="POST">
+                    <div class="ppe-grid">
+                        <!-- Head & Face Protection -->
+                        <div class="ppe-category-card">
+                            <div class="ppe-category-header">
+                                <span class="category-label">ZONE A: HEAD/FACE</span>
+                            </div>
+                            <!-- Iterate items manually to preserve IDs -->
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="10" id="c10" {% if 10 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Helmet</span>
+                                <span class="ppe-id">ID:10</span>
+                            </label>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="12" id="c12" {% if 12 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Head</span>
+                                <span class="ppe-id">ID:12</span>
+                            </label>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="4" id="c4" {% if 4 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Face Guard</span>
+                                <span class="ppe-id">ID:04</span>
+                            </label>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="5" id="c5" {% if 5 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Face Mask</span>
+                                <span class="ppe-id">ID:05</span>
+                            </label>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="3" id="c3" {% if 3 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Face</span>
+                                <span class="ppe-id">ID:03</span>
+                            </label>
+                        </div>
+
+                        <!-- Body & Clothing -->
+                        <div class="ppe-category-card">
+                            <div class="ppe-category-header">
+                                <span class="category-label">ZONE B: BODY</span>
+                            </div>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="16" id="c16" {% if 16 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Safety Vest</span>
+                                <span class="ppe-id">ID:16</span>
+                            </label>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="15" id="c15" {% if 15 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Safety Suit</span>
+                                <span class="ppe-id">ID:15</span>
+                            </label>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="13" id="c13" {% if 13 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Medical Suit</span>
+                                <span class="ppe-id">ID:13</span>
+                            </label>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="0" id="c0" {% if 0 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Person</span>
+                                <span class="ppe-id">ID:00</span>
+                            </label>
+                        </div>
+
+                        <!-- Hands & Feet -->
+                        <div class="ppe-category-card">
+                            <div class="ppe-category-header">
+                                <span class="category-label">ZONE C: EXTREMITIES</span>
+                            </div>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="9" id="c9" {% if 9 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Gloves</span>
+                                <span class="ppe-id">ID:09</span>
+                            </label>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="11" id="c11" {% if 11 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Hands</span>
+                                <span class="ppe-id">ID:11</span>
+                            </label>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="14" id="c14" {% if 14 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Shoes</span>
+                                <span class="ppe-id">ID:14</span>
+                            </label>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="6" id="c6" {% if 6 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Foot</span>
+                                <span class="ppe-id">ID:06</span>
+                            </label>
+                        </div>
+
+                        <!-- Accessories & Tools -->
+                        <div class="ppe-category-card">
+                            <div class="ppe-category-header">
+                                <span class="category-label">ZONE D: EQUIPMENT</span>
+                            </div>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="8" id="c8" {% if 8 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Glasses</span>
+                                <span class="ppe-id">ID:08</span>
+                            </label>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="2" id="c2" {% if 2 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Ear Muffs</span>
+                                <span class="ppe-id">ID:02</span>
+                            </label>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="1" id="c1" {% if 1 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Ear</span>
+                                <span class="ppe-id">ID:01</span>
+                            </label>
+                            <label class="ppe-item">
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" name="ppe_ids" value="7" id="c7" {% if 7 in current_ppe
+                                        %}checked{% endif %}>
+                                    <span class="checkbox-visual"></span>
+                                </div>
+                                <span>Tool</span>
+                                <span class="ppe-id">ID:07</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 24px; text-align: right;">
+                        <button type="submit" class="btn-submit">
+                            UPDATE PROTOCOLS
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Access Logs -->
+        <div class="main-card">
+            <div class="card-header">
+                <h3 class="card-title">ACCESS LOGS</h3>
+                <div class="live-indicator-wrapper">
+                    <span class="live-dot"></span>
+                    <small style="color: #FF3333; font-weight: bold;">LIVE</small>
+                </div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>TIMESTAMP</th>
+                            <th>IDENTITY</th>
+                            <th>STATUS</th>
+                            <th>DETAILS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td class="text-mono">{{ log.timestamp }}</td>
+                            <td><strong>{{ log.name if log.name else '—' }}</strong></td>
+                            <td>
+                                {% if log.status == 'GRANTED' %}
+                                <span class="status-badge status-granted">GRANTED</span>
+                                {% else %}
+                                <span class="status-badge status-denied">DENIED</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted">{{ log.details }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4">
+                                <div class="empty-state">
+                                    NO DATA RECORDED
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Subtle selection animation on checkbox toggle
+        document.querySelectorAll('.ppe-item').forEach(item => {
+            item.addEventListener('click', function () {
+                this.classList.add('selecting');
+                setTimeout(() => this.classList.remove('selecting'), 200);
+            });
+        });
+    </script>
+</body>
+
+</html>

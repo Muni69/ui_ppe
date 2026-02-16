@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>SITE COMMAND - RFID</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/command_center.css') }}">
+    <style>
+        /* Specific overrides for RFID page */
+        .register-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 16px;
+            align-items: end;
+        }
+
+        .uid-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .esp-config {
+            margin-top: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="brand">
+                <div class="brand-text">
+                    <h1>RFID Management</h1>
+                    <small>SYSTEM: SECURE // MODE: ENROLLMENT</small>
+                </div>
+            </div>
+
+            <div class="brand-placeholder rounded-logo">
+                <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Logo">
+            </div>
+
+            <div class="header-actions">
+                <a href="/" class="btn-scan">
+                    BACK TO DASHBOARD
+                </a>
+            </div>
+        </header>
+
+        {% if error %}
+        <div
+            style="background: rgba(255, 50, 50, 0.2); border: 1px solid red; color: #ff5555; padding: 10px; margin-bottom: 20px;">
+            ERROR: {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div
+            style="background: rgba(0, 255, 100, 0.2); border: 1px solid #00ff66; color: #00ff66; padding: 10px; margin-bottom: 20px;">
+            SUCCESS: {{ success }}
+        </div>
+        {% endif %}
+
+        <!-- Register Card Section -->
+        <div class="main-card">
+            <div class="card-header">
+                <h2 class="card-title">ENROLL NEW DEVICE</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" class="register-form" id="rfidForm">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="color: #999; font-size: 0.8rem;">CARD UID</label>
+                        <div class="uid-input-group">
+                            <input type="text" name="uid" id="uidInput" class="form-input" required readonly
+                                style="text-transform: uppercase;">
+                            <input type="hidden" name="auth_token" id="authTokenInput">
+                            <button type="button" class="btn-scan" id="scanBtn" onclick="scanFromReader()">
+                                INITIATE SCAN
+                            </button>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="color: #999; font-size: 0.8rem;">ASSIGN TO PERSONNEL</label>
+                        <select name="user_id" class="form-select" required>
+                            <option value="" disabled selected>SELECT RECIPIENT</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        AUTHORIZE
+                    </button>
+                </form>
+
+                <div class="esp-config">
+                    <label style="font-size: 0.75rem; color: #777;">READER IP:</label>
+                    <input type="text" id="espIpInput" class="form-input" value="10.83.183.90"
+                        style="width: 150px; padding: 4px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Registered Cards Section -->
+        <div class="main-card">
+            <div class="card-header">
+                <h3 class="card-title">REGISTERED DEVICES ({{ cards|length }})</h3>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                {% if cards %}
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>DEVICE UID</th>
+                            <th>ASSIGNED PERSONNEL</th>
+                            <th>DATE ADDED</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for card in cards %}
+                        <tr>
+                            <td><span class="uid-badge">{{ card.uid }}</span></td>
+                            <td><strong>{{ card.worker_name or 'UNKNOWN' }}</strong></td>
+                            <td class="text-mono">{{ card.added_at or '--' }}</td>
+                            <td>
+                                <a href="/delete_rfid/{{ card.id }}" class="btn-remove"
+                                    onclick="return confirm('Remove this card?')">
+                                    DEAUTHORIZE
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    NO DEVICES REGISTERED
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- PRESERVED JAVASCRIPT LOGIC -->
+    <script>
+        let scanInterval = null;
+
+        function scanFromReader() {
+            const btn = document.getElementById('scanBtn');
+            const uidInput = document.getElementById('uidInput');
+            const tokenInput = document.getElementById('authTokenInput');
+            const espIp = document.getElementById('espIpInput').value.trim();
+
+            if (!espIp) {
+                alert('Please enter the ESP32 IP address');
+                return;
+            }
+
+            // If already scanning, stop
+            if (scanInterval) {
+                clearInterval(scanInterval);
+                scanInterval = null;
+                btn.textContent = 'Scan';
+                btn.classList.remove('scanning');
+                return;
+            }
+
+            btn.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Hold card on reader...';
+            btn.classList.add('scanning');
+
+            let attempts = 0;
+            const maxAttempts = 20; // 10 seconds
+
+            scanInterval = setInterval(() => {
+                attempts++;
+                if (attempts > maxAttempts) {
+                    clearInterval(scanInterval);
+                    scanInterval = null;
+                    btn.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Scan';
+                    btn.classList.remove('scanning');
+                    alert('Scan timed out. Hold the card on the reader and try again.');
+                    return;
+                }
+
+                // Call POST /rfid_enroll on ESP32 to write token + read UID
+                fetch(`http://${espIp}/rfid_enroll`, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.error) {
+                            // Card not detected yet, keep polling
+                            console.log('Enroll poll:', data.error);
+                            return;
+                        }
+                        if (data.uid && data.uid.length > 0) {
+                            uidInput.value = data.uid;
+                            tokenInput.value = data.token || '';
+                            clearInterval(scanInterval);
+                            scanInterval = null;
+                            btn.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Enrolled!';
+                            btn.classList.remove('scanning');
+                            setTimeout(() => {
+                                btn.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Scan';
+                            }, 2000);
+                        }
+                    })
+                    .catch(err => {
+                        console.warn('ESP32 enroll poll error:', err);
+                    });
+            }, 500);
+        }
+
+        // Auto-dismiss alerts after 5 seconds
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                alert.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-8px)';
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+        });
+    </script>
+</body>
+
+</html>

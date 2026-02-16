@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>SITE COMMAND - Faces</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/command_center.css') }}">
+    <style>
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .user-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+        }
+
+        .user-image-wrapper {
+            height: 200px;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .user-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(80%);
+            transition: filter 0.3s;
+        }
+
+        .user-card:hover .user-image {
+            filter: grayscale(0%);
+        }
+
+        .user-info {
+            padding: 16px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="brand">
+                <div class="brand-text">
+                    <h1>Personnel Management</h1>
+                    <small>SYSTEM: BIOMETRIC // DATABASE: CONNECTED</small>
+                </div>
+            </div>
+
+            <div class="brand-placeholder rounded-logo">
+                <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Logo">
+            </div>
+
+            <div class="header-actions">
+                <a href="/" class="btn-scan">
+                    BACK TO DASHBOARD
+                </a>
+            </div>
+        </header>
+
+        <!-- Upload Section -->
+        <div class="main-card">
+            <div class="card-header">
+                <h2 class="card-title">AUTHORIZE NEW PERSONNEL</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data"
+                    style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <label style="color: #999; font-size: 0.8rem; display: block; margin-bottom: 4px;">FULL
+                            NAME</label>
+                        <input type="text" name="name" class="form-input" required>
+                    </div>
+                    <div style="flex: 1; min-width: 250px;">
+                        <label style="color: #999; font-size: 0.8rem; display: block; margin-bottom: 4px;">BIOMETRIC
+                            DATA (PHOTO)</label>
+                        <input type="file" name="image" class="form-input" accept="image/*" required
+                            style="padding: 10px;">
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        UPLOAD & AUTHORIZE
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Authorized Users Section -->
+        <div class="main-card">
+            <div class="card-header">
+                <h3 class="card-title">ACTIVE ROSTER</h3>
+            </div>
+            <div class="card-body">
+                <div class="user-grid">
+                    {% for user in users %}
+                    <div class="user-card">
+                        <div class="user-image-wrapper">
+                            <img src="/{{ user.image_path }}" alt="{{ user.name }}" class="user-image">
+                        </div>
+                        <div class="user-info">
+                            <h3 style="margin: 0 0 8px 0; font-size: 1rem;">{{ user.name }}</h3>
+                            <a href="/delete_user/{{ user.id }}" class="btn-revoke"
+                                onclick="return confirm('Revoke access for {{ user.name }}?')">
+                                REVOKE CLEARANCE
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        NO PERSONNEL AUTHORIZED
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
