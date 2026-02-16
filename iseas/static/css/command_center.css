@@ -112,45 +112,41 @@ a {
     justify-content: space-between;
     align-items: center;
     position: relative;
-    padding: var(--space-md);
+    padding: 0 15px;
+    /* Moved further left for 'Edge-to-Edge' look */
     margin-bottom: 32px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
+    background: #1E293B;
+    /* Desktop Slate 800 */
+    border: 1px solid #334155;
     border-radius: var(--radius-core);
-    height: 96px;
-    /* Increased height for larger logo */
+    height: 100px;
+    /* Increased for dominant logo */
 }
 
 .brand {
     display: flex;
     align-items: center;
-    gap: var(--space-md);
-    flex: 1;
-    /* Left section */
+    gap: 15px;
+    /* Matching desktop brand padx=15 */
 }
 
 .brand-placeholder {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     display: flex;
     align-items: center;
-    justify-content: center;
-    z-index: 10;
-    pointer-events: none;
-    /* Prevent blocking clicks if size increases */
 }
 
 /* Logo Size Update & Inversion */
 .brand-placeholder img {
-    height: 75px;
-    /* Increased by another 15% */
+    height: 92px;
+    /* Bold and Dominant */
     width: auto;
     display: block;
-    filter: invert(1) brightness(2);
+    filter: invert(1) brightness(1.2);
+    /* Restored line detail (no blow-out) */
     mix-blend-mode: screen;
-    /* Ensures any dark background becomes transparent */
+    background: transparent;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
 }
 
 .header-actions {
@@ -403,13 +399,7 @@ input[type="file"] {
     color: white;
 }
 
-/* Rounded Logo Utility */
-.rounded-logo img {
-    border-radius: 50%;
-    overflow: hidden;
-    object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-}
+/* Rounded Logo Utility (Removed) */
 
 /* Tables */
 .table-modern {
@@ -424,21 +414,22 @@ input[type="file"] {
 
 .table-modern th {
     text-align: center;
-    padding: var(--space-md);
+    padding: 12px var(--space-md);
     border-bottom: 1px solid var(--border-subtle);
     color: var(--text-secondary);
     text-transform: uppercase;
     font-weight: 600;
     font-size: 0.75rem;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    /* Translucent dividers */
 }
 
 .table-modern td {
     text-align: center;
-    padding: var(--space-md);
+    padding: 12px var(--space-md);
     border-bottom: 1px solid #222;
     color: var(--text-primary);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .table-modern th:last-child,

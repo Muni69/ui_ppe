@@ -36,15 +36,17 @@
         <!-- Header -->
         <!-- Header -->
         <header class="dashboard-header">
-            <div class="brand">
-                <div class="brand-text">
-                    <h1>RFID Management</h1>
-                    <small>SYSTEM: SECURE // MODE: ENROLLMENT</small>
+            <div style="display: flex; align-items: center;">
+                <div class="brand-placeholder">
+                    <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Logo">
                 </div>
-            </div>
 
-            <div class="brand-placeholder rounded-logo">
-                <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Logo">
+                <div class="brand">
+                    <div class="brand-text">
+                        <h1>RFID Management</h1>
+                        <small>SYSTEM: SECURE // MODE: ENROLLMENT</small>
+                    </div>
+                </div>
             </div>
 
             <div class="header-actions">

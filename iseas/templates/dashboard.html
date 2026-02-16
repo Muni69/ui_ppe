@@ -13,15 +13,17 @@
     <div class="container">
         <!-- Header -->
         <header class="dashboard-header">
-            <div class="brand">
-                <div class="brand-text">
-                    <h1>Site Command</h1>
-                    <small>STATUS: ONLINE // SYSTEM: ACTIVE</small>
+            <div style="display: flex; align-items: center;">
+                <div class="brand-placeholder">
+                    <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Logo">
                 </div>
-            </div>
 
-            <div class="brand-placeholder rounded-logo">
-                <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Logo">
+                <div class="brand">
+                    <div class="brand-text">
+                        <h1>Site Command</h1>
+                        <small>STATUS: ONLINE // SYSTEM: ACTIVE</small>
+                    </div>
+                </div>
             </div>
 
             <div class="header-actions">

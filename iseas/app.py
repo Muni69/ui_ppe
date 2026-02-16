@@ -344,24 +344,16 @@ class SmartGateClient(ctk.CTk):
         """Header: Clean Slate 800 bar with Logo and Status Pill."""
         header = ctk.CTkFrame(self.main_container, fg_color="#1E293B", corner_radius=16, height=80, border_width=1, border_color="#334155")
         header.pack(fill="x", pady=(0, 20))
-        # Use grid for 3-section layout
+        # Use grid for 3-section layout with stability weights
         header.pack_propagate(False)
-        header.grid_columnconfigure(0, weight=1) # Left
-        header.grid_columnconfigure(1, weight=0) # Spacer (Logo floats over)
-        header.grid_columnconfigure(2, weight=1) # Right
+        header.grid_columnconfigure(0, weight=0) # Logo
+        header.grid_columnconfigure(1, weight=0) # Brand Text
+        header.grid_columnconfigure(2, weight=1) # Flexible Spacer (Keeps right side pinned)
         header.grid_rowconfigure(0, weight=1)
 
-        # 1. Left: Brand Text
-        brand_frame = ctk.CTkFrame(header, fg_color="transparent")
-        brand_frame.grid(row=0, column=0, sticky="w", padx=25)
-        ctk.CTkLabel(brand_frame, text="SITE COMMAND", font=("LunchType", 24, "bold"), text_color="#F8FAFC").pack(side="left")
-        ctk.CTkLabel(brand_frame, text="  |  AI SURVEILLANCE", font=("Inter", 14), text_color="#94A3B8").pack(side="left", padx=(10, 0))
-
-        # 2. Center: Logo (ABSOLUTE POSITIONING / ZERO-SHIFT)
-        # We place this container relative to the header frame to ensure it is mathematically centered
-        # regardless of the side content widths.
+        # 1. Left: Logo (Refined Isolation)
         logo_container = ctk.CTkFrame(header, fg_color="transparent")
-        logo_container.place(relx=0.5, rely=0.5, anchor="center")
+        logo_container.grid(row=0, column=0, sticky="w", padx=(25, 0))
         
         logo_loaded = False
         try:
@@ -369,19 +361,19 @@ class SmartGateClient(ctk.CTk):
             if os.path.exists(logo_path):
                 pil_image = Image.open(logo_path).convert("RGB")
                 
-                # 1. Invert: Black Helmet -> White Helmet, White BG -> Black BG
+                # 1. Invert: (Black helmet on White BG) -> White helmet on Black BG
                 pil_image = ImageOps.invert(pil_image)
                 
-                # 2. Smart Transparency: Use the grayscale luminance as the Alpha channel
-                # White pixels (helmet) become Opaque (255), Black pixels (bg) become Transparent (0)
-                gray_mask = pil_image.convert("L")
+                # 2. Hard Alpha Mask: 100% Transparency for Background
+                # Convert to grayscale and apply threshold: pixels < 60 become 0 (transparent), 
+                # pixels >= 60 become 255 (fully opaque white helmet)
+                gray_mask = pil_image.convert("L").point(lambda x: 0 if x < 60 else 255)
+                
                 pil_image = pil_image.convert("RGBA")
                 pil_image.putalpha(gray_mask)
                 
-                # 3. Resize to 90px (Dominant Anchor)
-                size = (90, 90) 
-                
-                # High-Quality Lanczos Resampling
+                # 3. Resize to 80px (Corrected for left alignment)
+                size = (80, 80) 
                 output = ImageOps.fit(pil_image, size, method=Image.LANCZOS, centering=(0.5, 0.5))
                 
                 self.logo_image = ctk.CTkImage(light_image=output, dark_image=output, size=size)
@@ -392,6 +384,12 @@ class SmartGateClient(ctk.CTk):
         
         if not logo_loaded:
              ctk.CTkLabel(logo_container, text="🛡️", font=("LunchType", 40)).pack()
+
+        # 2. Brand Text
+        brand_frame = ctk.CTkFrame(header, fg_color="transparent")
+        brand_frame.grid(row=0, column=1, sticky="w", padx=15)
+        ctk.CTkLabel(brand_frame, text="SITE COMMAND", font=("LunchType", 24, "bold"), text_color="#F8FAFC").pack(side="left")
+        ctk.CTkLabel(brand_frame, text="  |  AI SURVEILLANCE", font=("Inter", 14), text_color="#94A3B8").pack(side="left", padx=(10, 0))
 
         # 3. Right: Server Status (or Action Buttons)
         status_frame = ctk.CTkFrame(header, fg_color="transparent")
